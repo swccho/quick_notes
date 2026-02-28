@@ -15,11 +15,13 @@ class NoteProvider extends ChangeNotifier {
   bool _isReady = false;
   DateTime? _lastCreateAt;
   String? _initError;
+  double _sidebarWidth = 280;
 
   List<Note> get notes => List.unmodifiable(_notes);
   bool get isDarkMode => _isDarkMode;
   bool get isReady => _isReady;
   String? get initError => _initError;
+  double get sidebarWidth => _sidebarWidth;
 
   void toggleTheme() {
     _isDarkMode = !_isDarkMode;
@@ -71,6 +73,8 @@ class NoteProvider extends ChangeNotifier {
       await _storage.initSettings();
       _notes = _storage.getAllNotes();
       _isDarkMode = _storage.getIsDarkMode(defaultValue: true);
+      final stored = _storage.getSidebarWidth(defaultValue: 280);
+      _sidebarWidth = stored.clamp(240.0, 420.0);
       _sortNotes();
     } catch (e) {
       _initError = e.toString();
@@ -125,9 +129,36 @@ class NoteProvider extends ChangeNotifier {
     return _storage.exportNoteToTxt(_selectedNote!);
   }
 
+  Future<String?> exportAllNotes() async {
+    if (_notes.isEmpty) return null;
+    return _storage.exportAllNotesToJson(_notes);
+  }
+
+  Future<int> importNotes(String filePath) async {
+    final imported = await _storage.importNotesFromJsonFile(filePath);
+    final existingIds = _notes.map((n) => n.id).toSet();
+    final toAdd =
+        imported.where((n) => !existingIds.contains(n.id)).toList();
+    for (final note in toAdd) {
+      await _storage.saveNote(note);
+    }
+    _notes = [..._notes, ...toAdd];
+    _sortNotes();
+    notifyListeners();
+    return toAdd.length;
+  }
+
+  Future<void> setSidebarWidth(double value) async {
+    _sidebarWidth = value;
+    notifyListeners();
+    await _storage.setSidebarWidth(value);
+  }
+
   Future<void> clearAll() async {
     await _storage.clearAll();
     _notes = [];
+    _selectedNote = null;
+    _searchQuery = '';
     notifyListeners();
   }
 

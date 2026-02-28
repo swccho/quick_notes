@@ -20,6 +20,7 @@ class _NoteEditorState extends State<NoteEditor> {
   final FocusNode _titleFocusNode = FocusNode();
   Timer? _debounceTimer;
   String? _boundNoteId;
+  bool _isUpdatingControllers = false;
 
   static const Duration _debounceDuration = Duration(milliseconds: 400);
 
@@ -35,8 +36,13 @@ class _NoteEditorState extends State<NoteEditor> {
   void _syncControllers(Note note) {
     if (_boundNoteId == note.id) return;
     _boundNoteId = note.id;
-    _titleController.text = note.title;
-    _contentController.text = note.content;
+    _isUpdatingControllers = true;
+    try {
+      _titleController.text = note.title;
+      _contentController.text = note.content;
+    } finally {
+      _isUpdatingControllers = false;
+    }
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _titleFocusNode.requestFocus();
     });
@@ -45,14 +51,14 @@ class _NoteEditorState extends State<NoteEditor> {
   void _scheduleSave(Note note) {
     _debounceTimer?.cancel();
     _debounceTimer = Timer(_debounceDuration, () {
+      if (!context.mounted) return;
+      if (context.read<NoteProvider>().selectedNote?.id != note.id) return;
       final updated = note.copyWith(
         title: _titleController.text,
         content: _contentController.text,
         updatedAt: DateTime.now(),
       );
-      if (context.mounted) {
-        context.read<NoteProvider>().updateNote(updated);
-      }
+      context.read<NoteProvider>().updateNote(updated);
     });
   }
 
@@ -85,7 +91,15 @@ class _NoteEditorState extends State<NoteEditor> {
     if (selectedNote != null) {
       _syncControllers(selectedNote);
     } else {
+      _debounceTimer?.cancel();
       _boundNoteId = null;
+      _isUpdatingControllers = true;
+      try {
+        _titleController.text = '';
+        _contentController.text = '';
+      } finally {
+        _isUpdatingControllers = false;
+      }
     }
 
     final dateFormat = DateFormat('MMM d, h:mm a');
@@ -144,7 +158,10 @@ class _NoteEditorState extends State<NoteEditor> {
                                     fontWeight: FontWeight.bold,
                                   ),
                               maxLines: 1,
-                              onChanged: (_) => _scheduleSave(selectedNote),
+                              onChanged: (_) {
+                                if (_isUpdatingControllers) return;
+                                _scheduleSave(selectedNote);
+                              },
                             ),
                           ),
                           IconButton(
@@ -190,7 +207,10 @@ class _NoteEditorState extends State<NoteEditor> {
                           style: Theme.of(context).textTheme.bodyMedium,
                           maxLines: null,
                           expands: true,
-                          onChanged: (_) => _scheduleSave(selectedNote),
+                          onChanged: (_) {
+                                if (_isUpdatingControllers) return;
+                                _scheduleSave(selectedNote);
+                              },
                         ),
                       ),
                     ],

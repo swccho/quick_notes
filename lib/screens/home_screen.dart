@@ -29,8 +29,6 @@ class _HomeScreenState extends State<HomeScreen> {
   static const double _minSidebarWidth = 240;
   static const double _maxSidebarWidth = 420;
 
-  double _sidebarWidth = 280;
-
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<NoteProvider>();
@@ -137,15 +135,15 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Row(
               children: [
                 SizedBox(
-                  width: _sidebarWidth,
+                  width: provider.sidebarWidth
+                      .clamp(_minSidebarWidth, _maxSidebarWidth),
                   child: const Sidebar(),
                 ),
                 GestureDetector(
                   onHorizontalDragUpdate: (details) {
-                    setState(() {
-                      _sidebarWidth = (_sidebarWidth + details.delta.dx)
-                          .clamp(_minSidebarWidth, _maxSidebarWidth);
-                    });
+                    final newWidth = (provider.sidebarWidth + details.delta.dx)
+                        .clamp(_minSidebarWidth, _maxSidebarWidth);
+                    provider.setSidebarWidth(newWidth);
                   },
                   child: MouseRegion(
                     cursor: SystemMouseCursors.resizeColumn,

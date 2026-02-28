@@ -67,6 +67,20 @@ class _SidebarState extends State<Sidebar> {
                     PopupMenuButton<String>(
                       icon: const Icon(Icons.more_vert),
                       onSelected: (value) async {
+                        if (value == 'export_all') {
+                          final path = await context
+                              .read<NoteProvider>()
+                              .exportAllNotes();
+                          if (!context.mounted) return;
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(path != null
+                                  ? 'Exported to: $path'
+                                  : 'No notes to export'),
+                            ),
+                          );
+                          return;
+                        }
                         if (value != 'clear_all') return;
                         final confirmed = await showDialog<bool>(
                           context: context,
@@ -94,6 +108,10 @@ class _SidebarState extends State<Sidebar> {
                         }
                       },
                       itemBuilder: (context) => [
+                        const PopupMenuItem<String>(
+                          value: 'export_all',
+                          child: Text('Export all notes'),
+                        ),
                         const PopupMenuItem<String>(
                           value: 'clear_all',
                           child: Text('Clear all notes'),
