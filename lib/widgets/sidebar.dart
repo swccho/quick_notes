@@ -98,6 +98,20 @@ class Sidebar extends StatelessWidget {
                     },
                   ),
           ),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                IconButton(
+                  icon: Icon(
+                    provider.isDarkMode ? Icons.light_mode : Icons.dark_mode,
+                  ),
+                  onPressed: () =>
+                      context.read<NoteProvider>().toggleTheme(),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );

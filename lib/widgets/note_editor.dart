@@ -104,29 +104,32 @@ class _NoteEditorState extends State<NoteEditor> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
+                          Expanded(
+                            child: TextField(
+                              controller: _titleController,
+                              decoration: const InputDecoration(
+                                border: InputBorder.none,
+                                isDense: true,
+                                hintText: 'Title',
+                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headlineSmall
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                              maxLines: 1,
+                              onChanged: (_) => _scheduleSave(selectedNote),
+                            ),
+                          ),
                           IconButton(
                             icon: const Icon(Icons.delete_outline),
-                            onPressed: () => _confirmDelete(context, selectedNote),
+                            onPressed: () =>
+                                _confirmDelete(context, selectedNote),
                           ),
                         ],
-                      ),
-                      TextField(
-                        controller: _titleController,
-                        decoration: const InputDecoration(
-                          border: InputBorder.none,
-                          isDense: true,
-                          hintText: 'Title',
-                        ),
-                        style: Theme.of(context)
-                            .textTheme
-                            .headlineSmall
-                            ?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
-                        maxLines: 1,
-                        onChanged: (_) => _scheduleSave(selectedNote),
                       ),
                       const SizedBox(height: 4),
                       Text(

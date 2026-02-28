@@ -15,19 +15,7 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final provider = context.watch<NoteProvider>();
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Quick Notes'),
-        actions: [
-          IconButton(
-            icon: Icon(
-              provider.isDarkMode ? Icons.light_mode : Icons.dark_mode,
-            ),
-            onPressed: () => context.read<NoteProvider>().toggleTheme(),
-          ),
-        ],
-      ),
       body: Shortcuts(
         shortcuts: const {
           SingleActivator(LogicalKeyboardKey.keyS, control: true):
