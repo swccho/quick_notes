@@ -17,6 +17,7 @@ class NoteEditor extends StatefulWidget {
 class _NoteEditorState extends State<NoteEditor> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _contentController = TextEditingController();
+  final FocusNode _titleFocusNode = FocusNode();
   Timer? _debounceTimer;
   String? _boundNoteId;
 
@@ -27,6 +28,7 @@ class _NoteEditorState extends State<NoteEditor> {
     _debounceTimer?.cancel();
     _titleController.dispose();
     _contentController.dispose();
+    _titleFocusNode.dispose();
     super.dispose();
   }
 
@@ -35,6 +37,9 @@ class _NoteEditorState extends State<NoteEditor> {
     _boundNoteId = note.id;
     _titleController.text = note.title;
     _contentController.text = note.content;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _titleFocusNode.requestFocus();
+    });
   }
 
   void _scheduleSave(Note note) {
@@ -105,6 +110,7 @@ class _NoteEditorState extends State<NoteEditor> {
                           Expanded(
                             child: TextField(
                               controller: _titleController,
+                              focusNode: _titleFocusNode,
                               decoration: const InputDecoration(
                                 border: InputBorder.none,
                                 isDense: true,
