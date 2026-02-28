@@ -38,13 +38,17 @@ class NoteProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> init() async {
-    await _storage.init();
-    _notes = _storage.getAllNotes();
+  void _sortNotes() {
     _notes.sort((a, b) {
       if (a.isPinned != b.isPinned) return a.isPinned ? -1 : 1;
       return b.updatedAt.compareTo(a.updatedAt);
     });
+  }
+
+  Future<void> init() async {
+    await _storage.init();
+    _notes = _storage.getAllNotes();
+    _sortNotes();
     notifyListeners();
   }
 
@@ -68,13 +72,22 @@ class NoteProvider extends ChangeNotifier {
     }
     await _storage.saveNote(note);
     if (wasSelected) _selectedNote = note;
+    _sortNotes();
     notifyListeners();
   }
 
+  Future<void> togglePin(Note note) async {
+    final updatedNote = note.copyWith(
+      isPinned: !note.isPinned,
+      updatedAt: DateTime.now(),
+    );
+    await updateNote(updatedNote);
+  }
+
   Future<void> deleteNote(String id) async {
+    _notes.removeWhere((note) => note.id == id);
     await _storage.deleteNote(id);
     if (_selectedNote?.id == id) _selectedNote = null;
-    _notes = _storage.getAllNotes();
     notifyListeners();
   }
 
@@ -97,6 +110,7 @@ class NoteProvider extends ChangeNotifier {
     );
     await _storage.saveNote(note);
     _notes = [note, ..._notes];
+    _sortNotes();
     _selectedNote = note;
     notifyListeners();
   }

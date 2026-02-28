@@ -59,25 +59,40 @@ class Sidebar extends StatelessWidget {
                     itemBuilder: (context, index) {
                       final note = notes[index];
                       final isSelected = selectedId == note.id;
+                      final colorScheme = Theme.of(context).colorScheme;
                       return Material(
                         color: isSelected
-                            ? Theme.of(context)
-                                .colorScheme
-                                .primaryContainer
+                            ? colorScheme.primaryContainer
                             : Colors.transparent,
-                        child: InkWell(
-                          onTap: () =>
-                              context.read<NoteProvider>().selectNote(note),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 12,
-                              horizontal: 16,
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: InkWell(
+                                onTap: () =>
+                                    context.read<NoteProvider>().selectNote(note),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12,
+                                    horizontal: 16,
+                                  ),
+                                  child: Text(
+                                    note.title,
+                                    style: Theme.of(context).textTheme.bodyMedium,
+                                  ),
+                                ),
+                              ),
                             ),
-                            child: Text(
-                              note.title,
-                              style: Theme.of(context).textTheme.bodyMedium,
+                            IconButton(
+                              icon: Icon(
+                                note.isPinned ? Icons.push_pin : Icons.push_pin_outlined,
+                                color: note.isPinned
+                                    ? colorScheme.primary
+                                    : colorScheme.onSurfaceVariant,
+                              ),
+                              onPressed: () =>
+                                  context.read<NoteProvider>().togglePin(note),
                             ),
-                          ),
+                          ],
                         ),
                       );
                     },
