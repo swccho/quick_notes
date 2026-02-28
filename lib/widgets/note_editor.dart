@@ -86,15 +86,11 @@ class _NoteEditorState extends State<NoteEditor> {
     return Container(
       padding: const EdgeInsets.all(16),
       child: selectedNote == null
-          ? Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Select or create a note to start editing',
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-              ],
+          ? Center(
+              child: Text(
+                'Select or create a note to start editing',
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
             )
           : LayoutBuilder(
               builder: (context, constraints) {

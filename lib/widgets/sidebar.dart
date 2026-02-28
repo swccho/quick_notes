@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/note_provider.dart';
@@ -49,9 +50,29 @@ class Sidebar extends StatelessWidget {
           Expanded(
             child: notes.isEmpty
                 ? Center(
-                    child: Text(
-                      'No notes yet',
-                      style: Theme.of(context).textTheme.bodyMedium,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'No notes yet',
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Create your first note to get started.',
+                            style: Theme.of(context).textTheme.bodyMedium,
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 16),
+                          FilledButton(
+                            onPressed: () =>
+                                context.read<NoteProvider>().createNewNote(),
+                            child: const Text('Create Note'),
+                          ),
+                        ],
+                      ),
                     ),
                   )
                 : ListView.builder(
@@ -75,9 +96,26 @@ class Sidebar extends StatelessWidget {
                                     vertical: 12,
                                     horizontal: 16,
                                   ),
-                                  child: Text(
-                                    note.title,
-                                    style: Theme.of(context).textTheme.bodyMedium,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        note.title,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyMedium,
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        DateFormat('MMM d, h:mm a')
+                                            .format(note.updatedAt),
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodySmall,
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),

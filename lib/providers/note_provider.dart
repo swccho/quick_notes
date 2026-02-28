@@ -18,6 +18,7 @@ class NoteProvider extends ChangeNotifier {
 
   void toggleTheme() {
     _isDarkMode = !_isDarkMode;
+    _storage.setIsDarkMode(_isDarkMode);
     notifyListeners();
   }
   String get searchQuery => _searchQuery;
@@ -58,7 +59,9 @@ class NoteProvider extends ChangeNotifier {
 
   Future<void> init() async {
     await _storage.init();
+    await _storage.initSettings();
     _notes = _storage.getAllNotes();
+    _isDarkMode = _storage.getIsDarkMode(defaultValue: true);
     _sortNotes();
     notifyListeners();
   }
@@ -70,19 +73,21 @@ class NoteProvider extends ChangeNotifier {
   }
 
   Future<void> updateNote(Note note) async {
-    final index = _notes.indexWhere((n) => n.id == note.id);
-    final wasSelected = _selectedNote?.id == note.id;
+    final normalized =
+        note.title.trim().isEmpty ? note.copyWith(title: 'Untitled') : note;
+    final index = _notes.indexWhere((n) => n.id == normalized.id);
+    final wasSelected = _selectedNote?.id == normalized.id;
     if (index >= 0) {
       _notes = [
         ..._notes.sublist(0, index),
-        note,
+        normalized,
         ..._notes.sublist(index + 1),
       ];
     } else {
       _notes = _storage.getAllNotes();
     }
-    await _storage.saveNote(note);
-    if (wasSelected) _selectedNote = note;
+    await _storage.saveNote(normalized);
+    if (wasSelected) _selectedNote = normalized;
     _sortNotes();
     notifyListeners();
   }
