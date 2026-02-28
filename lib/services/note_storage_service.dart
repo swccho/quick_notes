@@ -1,4 +1,8 @@
+import 'dart:io';
+
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 
 import '../models/note.dart';
 
@@ -46,5 +50,32 @@ class NoteStorageService {
 
   Future<void> clearAll() async {
     await _box?.clear();
+  }
+
+  /// Exports [note] to a .txt file in [documents]/QuickNotes/exports.
+  /// Returns the absolute path of the exported file.
+  Future<String> exportNoteToTxt(Note note) async {
+    final dir = await getApplicationDocumentsDirectory();
+    final exportDir = Directory(p.join(dir.path, 'QuickNotes', 'exports'));
+    if (!await exportDir.exists()) {
+      await exportDir.create(recursive: true);
+    }
+    final sanitized =
+        note.title.replaceAll(RegExp(r'[\\/:*?"<>|]'), '_').trim();
+    final baseName =
+        '${sanitized.isEmpty ? 'note' : sanitized}-${_formatExportDate(note.updatedAt)}';
+    final file = File(p.join(exportDir.path, '$baseName.txt'));
+    final content = '${note.title}\n\n${note.content}';
+    await file.writeAsString(content);
+    return file.absolute.path;
+  }
+
+  static String _formatExportDate(DateTime d) {
+    final y = d.year;
+    final m = d.month.toString().padLeft(2, '0');
+    final day = d.day.toString().padLeft(2, '0');
+    final h = d.hour.toString().padLeft(2, '0');
+    final min = d.minute.toString().padLeft(2, '0');
+    return '$y$m$day-$h$min';
   }
 }

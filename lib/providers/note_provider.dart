@@ -13,6 +13,7 @@ class NoteProvider extends ChangeNotifier {
   String _searchQuery = '';
   bool _isDarkMode = true;
   bool _isReady = false;
+  DateTime? _lastCreateAt;
 
   List<Note> get notes => List.unmodifiable(_notes);
   bool get isDarkMode => _isDarkMode;
@@ -120,6 +121,11 @@ class NoteProvider extends ChangeNotifier {
 
   Future<void> createNewNote() async {
     final now = DateTime.now();
+    if (_lastCreateAt != null &&
+        now.difference(_lastCreateAt!) < const Duration(milliseconds: 500)) {
+      return;
+    }
+    _lastCreateAt = now;
     final note = Note(
       id: const Uuid().v4(),
       title: 'Untitled',
