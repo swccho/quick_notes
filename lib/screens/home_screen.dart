@@ -10,6 +10,10 @@ class _SaveNoteIntent extends Intent {
   const _SaveNoteIntent();
 }
 
+class _DeleteNoteIntent extends Intent {
+  const _DeleteNoteIntent();
+}
+
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -20,6 +24,7 @@ class HomeScreen extends StatelessWidget {
         shortcuts: const {
           SingleActivator(LogicalKeyboardKey.keyS, control: true):
               _SaveNoteIntent(),
+          SingleActivator(LogicalKeyboardKey.delete): _DeleteNoteIntent(),
         },
         child: Actions(
           actions: {
@@ -32,6 +37,35 @@ class HomeScreen extends StatelessWidget {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Saved')),
                   );
+                }
+                return null;
+              },
+            ),
+            _DeleteNoteIntent: CallbackAction<_DeleteNoteIntent>(
+              onInvoke: (_) async {
+                final note = context.read<NoteProvider>().selectedNote;
+                if (note == null) return null;
+                final confirmed = await showDialog<bool>(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text('Delete note?'),
+                    content: const Text(
+                      'This action cannot be undone.',
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(false),
+                        child: const Text('Cancel'),
+                      ),
+                      FilledButton(
+                        onPressed: () => Navigator.of(context).pop(true),
+                        child: const Text('Delete'),
+                      ),
+                    ],
+                  ),
+                );
+                if (confirmed == true && context.mounted) {
+                  context.read<NoteProvider>().deleteNote(note.id);
                 }
                 return null;
               },
