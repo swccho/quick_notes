@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/note_provider.dart';
+
+class _FocusSearchIntent extends Intent {
+  const _FocusSearchIntent();
+}
 
 class Sidebar extends StatefulWidget {
   const Sidebar({super.key});
@@ -13,10 +18,12 @@ class Sidebar extends StatefulWidget {
 
 class _SidebarState extends State<Sidebar> {
   final TextEditingController _searchController = TextEditingController();
+  final FocusNode _searchFocusNode = FocusNode();
 
   @override
   void dispose() {
     _searchController.dispose();
+    _searchFocusNode.dispose();
     super.dispose();
   }
 
@@ -25,9 +32,23 @@ class _SidebarState extends State<Sidebar> {
     final provider = context.watch<NoteProvider>();
     final notes = provider.filteredNotes;
     final selectedId = provider.selectedNote?.id;
-    return SizedBox(
-      width: 280,
-      child: Column(
+    return Shortcuts(
+      shortcuts: const {
+        SingleActivator(LogicalKeyboardKey.keyF, control: true):
+            _FocusSearchIntent(),
+      },
+      child: Actions(
+        actions: {
+          _FocusSearchIntent: CallbackAction<_FocusSearchIntent>(
+            onInvoke: (_) {
+              _searchFocusNode.requestFocus();
+              return null;
+            },
+          ),
+        },
+        child: SizedBox(
+          width: 280,
+          child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
@@ -48,6 +69,7 @@ class _SidebarState extends State<Sidebar> {
                 const SizedBox(height: 12),
                 TextField(
                   controller: _searchController,
+                  focusNode: _searchFocusNode,
                   decoration: InputDecoration(
                     border: const OutlineInputBorder(),
                     isDense: true,
@@ -136,6 +158,17 @@ class _SidebarState extends State<Sidebar> {
                                             .textTheme
                                             .bodySmall,
                                       ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        note.content.trim().isEmpty
+                                            ? '(Empty)'
+                                            : note.content.trim(),
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodySmall,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -172,6 +205,8 @@ class _SidebarState extends State<Sidebar> {
             ),
           ),
         ],
+          ),
+        ),
       ),
     );
   }

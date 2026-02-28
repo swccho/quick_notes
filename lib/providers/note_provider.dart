@@ -12,9 +12,11 @@ class NoteProvider extends ChangeNotifier {
   Note? _selectedNote;
   String _searchQuery = '';
   bool _isDarkMode = true;
+  bool _isReady = false;
 
   List<Note> get notes => List.unmodifiable(_notes);
   bool get isDarkMode => _isDarkMode;
+  bool get isReady => _isReady;
 
   void toggleTheme() {
     _isDarkMode = !_isDarkMode;
@@ -58,11 +60,14 @@ class NoteProvider extends ChangeNotifier {
   }
 
   Future<void> init() async {
+    _isReady = false;
+    notifyListeners();
     await _storage.init();
     await _storage.initSettings();
     _notes = _storage.getAllNotes();
     _isDarkMode = _storage.getIsDarkMode(defaultValue: true);
     _sortNotes();
+    _isReady = true;
     notifyListeners();
   }
 

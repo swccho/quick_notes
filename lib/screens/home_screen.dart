@@ -23,6 +23,12 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isReady = context.watch<NoteProvider>().isReady;
+    if (!isReady) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
     return Scaffold(
       body: Shortcuts(
         shortcuts: const {
