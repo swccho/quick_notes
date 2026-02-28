@@ -14,6 +14,10 @@ class _DeleteNoteIntent extends Intent {
   const _DeleteNoteIntent();
 }
 
+class _NewNoteIntent extends Intent {
+  const _NewNoteIntent();
+}
+
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -24,6 +28,8 @@ class HomeScreen extends StatelessWidget {
         shortcuts: const {
           SingleActivator(LogicalKeyboardKey.keyS, control: true):
               _SaveNoteIntent(),
+          SingleActivator(LogicalKeyboardKey.keyN, control: true):
+              _NewNoteIntent(),
           SingleActivator(LogicalKeyboardKey.delete): _DeleteNoteIntent(),
         },
         child: Actions(
@@ -38,6 +44,15 @@ class HomeScreen extends StatelessWidget {
                     const SnackBar(content: Text('Saved')),
                   );
                 }
+                return null;
+              },
+            ),
+            _NewNoteIntent: CallbackAction<_NewNoteIntent>(
+              onInvoke: (_) {
+                context.read<NoteProvider>().createNewNote();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('New note created')),
+                );
                 return null;
               },
             ),
