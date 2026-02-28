@@ -22,11 +22,9 @@ class Sidebar extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Text('Quick Notes'),
-                const SizedBox(height: 4),
                 Text(
-                  '${provider.notes.length} Notes',
-                  style: Theme.of(context).textTheme.bodySmall,
+                  'Quick Notes (${provider.notes.length})',
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
                 const SizedBox(height: 12),
                 FilledButton(
