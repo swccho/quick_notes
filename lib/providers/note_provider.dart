@@ -9,12 +9,23 @@ class NoteProvider extends ChangeNotifier {
 
   final NoteStorageService _storage;
   List<Note> _notes = [];
+  Note? _selectedNote;
 
   List<Note> get notes => List.unmodifiable(_notes);
+  Note? get selectedNote => _selectedNote;
+
+  void selectNote(Note note) {
+    _selectedNote = note;
+    notifyListeners();
+  }
 
   Future<void> init() async {
     await _storage.init();
     _notes = _storage.getAllNotes();
+    _notes.sort((a, b) {
+      if (a.isPinned != b.isPinned) return a.isPinned ? -1 : 1;
+      return b.updatedAt.compareTo(a.updatedAt);
+    });
     notifyListeners();
   }
 
@@ -25,13 +36,25 @@ class NoteProvider extends ChangeNotifier {
   }
 
   Future<void> updateNote(Note note) async {
+    final index = _notes.indexWhere((n) => n.id == note.id);
+    final wasSelected = _selectedNote?.id == note.id;
+    if (index >= 0) {
+      _notes = [
+        ..._notes.sublist(0, index),
+        note,
+        ..._notes.sublist(index + 1),
+      ];
+    } else {
+      _notes = _storage.getAllNotes();
+    }
     await _storage.saveNote(note);
-    _notes = _storage.getAllNotes();
+    if (wasSelected) _selectedNote = note;
     notifyListeners();
   }
 
   Future<void> deleteNote(String id) async {
     await _storage.deleteNote(id);
+    if (_selectedNote?.id == id) _selectedNote = null;
     _notes = _storage.getAllNotes();
     notifyListeners();
   }
@@ -55,6 +78,7 @@ class NoteProvider extends ChangeNotifier {
     );
     await _storage.saveNote(note);
     _notes = [note, ..._notes];
+    _selectedNote = note;
     notifyListeners();
   }
 }

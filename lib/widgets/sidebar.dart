@@ -8,7 +8,9 @@ class Sidebar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final notes = context.watch<NoteProvider>().notes;
+    final provider = context.watch<NoteProvider>();
+    final notes = provider.notes;
+    final selectedId = provider.selectedNote?.id;
     return SizedBox(
       width: 280,
       child: Column(
@@ -20,6 +22,11 @@ class Sidebar extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const Text('Quick Notes'),
+                const SizedBox(height: 4),
+                Text(
+                  '${notes.length} Notes',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
                 const SizedBox(height: 12),
                 FilledButton(
                   onPressed: () =>
@@ -40,14 +47,27 @@ class Sidebar extends StatelessWidget {
                 : ListView.builder(
                     itemCount: notes.length,
                     itemBuilder: (context, index) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 8,
-                          horizontal: 0,
-                        ),
-                        child: Text(
-                          notes[index].title,
-                          style: Theme.of(context).textTheme.bodyMedium,
+                      final note = notes[index];
+                      final isSelected = selectedId == note.id;
+                      return Material(
+                        color: isSelected
+                            ? Theme.of(context)
+                                .colorScheme
+                                .primaryContainer
+                            : Colors.transparent,
+                        child: InkWell(
+                          onTap: () =>
+                              context.read<NoteProvider>().selectNote(note),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 12,
+                              horizontal: 16,
+                            ),
+                            child: Text(
+                              note.title,
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
+                          ),
                         ),
                       );
                     },
