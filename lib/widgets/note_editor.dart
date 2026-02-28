@@ -51,6 +51,29 @@ class _NoteEditorState extends State<NoteEditor> {
     });
   }
 
+  Future<void> _confirmDelete(BuildContext context, Note note) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete note?'),
+        content: const Text('This action cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true && context.mounted) {
+      context.read<NoteProvider>().deleteNote(note.id);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final selectedNote = context.watch<NoteProvider>().selectedNote;
@@ -80,6 +103,15 @@ class _NoteEditorState extends State<NoteEditor> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.delete_outline),
+                            onPressed: () => _confirmDelete(context, selectedNote),
+                          ),
+                        ],
+                      ),
                       TextField(
                         controller: _titleController,
                         decoration: const InputDecoration(
