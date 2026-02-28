@@ -18,8 +18,18 @@ class _NewNoteIntent extends Intent {
   const _NewNoteIntent();
 }
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  static const double _minSidebarWidth = 240;
+  static const double _maxSidebarWidth = 420;
+
+  double _sidebarWidth = 280;
 
   @override
   Widget build(BuildContext context) {
@@ -96,7 +106,25 @@ class HomeScreen extends StatelessWidget {
             autofocus: true,
             child: Row(
               children: [
-                const Sidebar(),
+                SizedBox(
+                  width: _sidebarWidth,
+                  child: const Sidebar(),
+                ),
+                GestureDetector(
+                  onHorizontalDragUpdate: (details) {
+                    setState(() {
+                      _sidebarWidth = (_sidebarWidth + details.delta.dx)
+                          .clamp(_minSidebarWidth, _maxSidebarWidth);
+                    });
+                  },
+                  child: MouseRegion(
+                    cursor: SystemMouseCursors.resizeColumn,
+                    child: Container(
+                      width: 6,
+                      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                    ),
+                  ),
+                ),
                 Expanded(child: const NoteEditor()),
               ],
             ),
