@@ -88,13 +88,29 @@ class _NoteEditorState extends State<NoteEditor> {
       _boundNoteId = null;
     }
 
+    final dateFormat = DateFormat('MMM d, h:mm a');
     return Container(
       padding: const EdgeInsets.all(16),
       child: selectedNote == null
           ? Center(
-              child: Text(
-                'Select or create a note to start editing',
-                style: Theme.of(context).textTheme.bodyMedium,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'No note selected',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Create a new note or select one from the sidebar.',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurfaceVariant,
+                        ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
               ),
             )
           : LayoutBuilder(
@@ -104,6 +120,11 @@ class _NoteEditorState extends State<NoteEditor> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      Text(
+                        'Created: ${dateFormat.format(selectedNote.createdAt)} · Updated: ${dateFormat.format(selectedNote.updatedAt)}',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                      const SizedBox(height: 4),
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
@@ -132,11 +153,6 @@ class _NoteEditorState extends State<NoteEditor> {
                                 _confirmDelete(context, selectedNote),
                           ),
                         ],
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Last edited: ${DateFormat.yMd().add_Hm().format(selectedNote.updatedAt)}',
-                        style: Theme.of(context).textTheme.bodySmall,
                       ),
                       const SizedBox(height: 12),
                       const Divider(),
