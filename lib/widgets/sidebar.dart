@@ -252,7 +252,9 @@ class _SidebarState extends State<Sidebar> {
           ),
           Padding(
             padding: const EdgeInsets.all(16),
-            child: Row(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 IconButton(
                   icon: Icon(
@@ -260,6 +262,50 @@ class _SidebarState extends State<Sidebar> {
                   ),
                   onPressed: () =>
                       context.read<NoteProvider>().toggleTheme(),
+                ),
+                const SizedBox(height: 8),
+                TextButton.icon(
+                  icon: const Icon(Icons.keyboard_outlined),
+                  label: const Text('Shortcuts'),
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (ctx) => AlertDialog(
+                        title: const Text('Keyboard Shortcuts'),
+                        content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Ctrl + N → New note',
+                              style: Theme.of(ctx).textTheme.bodyMedium,
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              'Ctrl + S → Save note',
+                              style: Theme.of(ctx).textTheme.bodyMedium,
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              'Ctrl + F → Focus search',
+                              style: Theme.of(ctx).textTheme.bodyMedium,
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              'Delete → Delete selected note',
+                              style: Theme.of(ctx).textTheme.bodyMedium,
+                            ),
+                          ],
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.of(ctx).pop(),
+                            child: const Text('Close'),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
                 ),
               ],
             ),
