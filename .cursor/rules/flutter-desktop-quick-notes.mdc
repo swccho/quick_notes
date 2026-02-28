@@ -1,0 +1,190 @@
+---
+description: Flutter Desktop project rules for Quick Notes — architecture, widgets, providers, Hive, theme, desktop UX
+alwaysApply: true
+---
+
+# FLUTTER DESKTOP PROJECT RULES (Quick Notes)
+
+---
+
+## 1. General Coding Rules
+
+1. Always generate **one file at a time**.
+2. Never modify multiple files unless explicitly told.
+3. Do not generate explanations unless requested.
+4. Keep code minimal and production-ready.
+5. No unnecessary comments.
+6. Follow Dart null-safety strictly.
+7. Use const constructors where possible.
+8. No magic numbers — use constants.
+9. No business logic inside UI widgets.
+10. Keep widgets small and focused.
+
+---
+
+## 2. Project Architecture Rules
+
+Structure strictly:
+
+```
+lib/
+  main.dart
+  app.dart
+  core/
+  models/
+  providers/
+  services/
+  screens/
+  widgets/
+```
+
+- `models/` → Pure data classes only.
+- `services/` → Storage, APIs, external integrations.
+- `providers/` → State management only.
+- `screens/` → Page-level UI.
+- `widgets/` → Reusable UI components.
+- `core/` → Themes, constants, helpers.
+
+Never mix responsibilities.
+
+---
+
+## 3. Widget Rules
+
+1. Use `StatelessWidget` unless state is required.
+2. Avoid deep nesting.
+3. Extract widgets if build method exceeds 80 lines.
+4. No business logic inside build().
+5. No async calls inside build().
+6. Use MediaQuery only when necessary.
+7. Prefer Expanded/Flexible over fixed sizes.
+8. Desktop-first layout (avoid mobile-only assumptions).
+
+---
+
+## 4. Provider Rules
+
+1. All state must live inside Provider.
+2. UI reads state via context.watch().
+3. UI triggers actions via provider methods.
+4. No UI logic inside provider.
+5. Provider must notifyListeners() only when necessary.
+6. Async operations live inside provider.
+7. No direct Hive calls inside UI.
+
+---
+
+## 5. Storage Rules (Hive)
+
+1. Only service layer interacts with Hive.
+2. Never call Hive directly from UI.
+3. Always open boxes during app initialization.
+4. Keep storage methods clean and isolated.
+5. No storage logic inside provider constructor.
+
+---
+
+## 6. Theme Rules
+
+1. Support Light and Dark mode.
+2. Use Material 3.
+3. No hardcoded colors inside widgets.
+4. All colors come from Theme.
+5. Theme configuration lives in `core/theme/`.
+
+---
+
+## 7. Desktop-Specific Rules
+
+1. Design for wide screens.
+2. Use Row-based layouts.
+3. Sidebar must be fixed width.
+4. Editor must expand.
+5. Add keyboard shortcuts later.
+6. Avoid mobile navigation patterns.
+
+---
+
+## 8. Model Rules
+
+1. Model must be immutable.
+2. Use copyWith().
+3. No logic inside model.
+4. Use DateTime for timestamps.
+5. Keep model pure.
+
+---
+
+## 9. Clean Code Rules
+
+1. No duplicate logic.
+2. No long functions (>40 lines).
+3. No deeply nested conditionals.
+4. Extract helper methods.
+5. Use meaningful names.
+6. Avoid dynamic types.
+7. Prefer final over var.
+
+---
+
+## 10. Development Workflow Rules
+
+1. Generate one file per prompt.
+2. After file creation → stop.
+3. Wait for confirmation before next file.
+4. No auto-refactoring unless requested.
+5. No premature optimization.
+
+---
+
+## 11. UI Constraints
+
+1. Sidebar width: fixed (250–300px).
+2. Editor fills remaining space.
+3. Padding consistent (16px standard).
+4. Rounded corners small.
+5. Clean minimal UI.
+6. No heavy shadows.
+
+---
+
+## 12. Performance Rules
+
+1. Use const where possible.
+2. Avoid rebuilding entire screen.
+3. Split widgets logically.
+4. No heavy computation in UI.
+5. Use debounce for search later.
+
+---
+
+## 13. Things To Never Do
+
+- Do not mix UI and storage.
+- Do not create god classes.
+- Do not hardcode strings everywhere.
+- Do not use setState in main architecture.
+- Do not skip provider layer.
+- Do not overcomplicate.
+
+---
+
+## 14. Prompt Behavior Rule (VERY IMPORTANT)
+
+Cursor must:
+
+- Generate short, precise code.
+- Follow architecture strictly.
+- Not generate multiple files.
+- Not rewrite existing files unless told.
+- Wait for next instruction after file completion.
+
+---
+
+## 15. Code Style Rules
+
+- Use trailing commas.
+- Keep lines under ~100 chars.
+- Use named parameters.
+- Prefer const constructors.
+- Prefer final fields.

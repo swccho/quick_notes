@@ -1,0 +1,145 @@
+---
+description: Quick Notes Level 3 – Flutter desktop rules (architecture, Provider, Hive, UI, theme, workflow)
+alwaysApply: true
+---
+
+# Quick Notes – Level 3 Professional Flutter Rules
+
+## Core Philosophy
+
+- Clean, scalable, maintainable, desktop-first, production-ready, easy to extend.
+- No over-engineering. No shortcuts.
+
+---
+
+## 1. Architecture (STRICT)
+
+```
+lib/
+  main.dart
+  app.dart
+  core/
+    theme/
+    constants/
+    utils/
+  models/
+  services/
+  providers/
+  screens/
+  widgets/
+```
+
+- **models/** → Pure data classes only.
+- **services/** → Hive, APIs, external integrations.
+- **providers/** → State & business logic.
+- **screens/** → Page-level layout only.
+- **widgets/** → Reusable UI components.
+- **core/** → Theme, constants, helpers.
+
+Never mix responsibilities.
+
+---
+
+## 2. State Management (Provider)
+
+1. All app state lives in Provider.
+2. UI never modifies state directly; UI only calls provider methods.
+3. Async operations live in Provider.
+4. Provider does not contain UI logic; it communicates with Services only.
+5. Avoid unnecessary `notifyListeners()`.
+6. No heavy logic inside UI.
+
+---
+
+## 3. Storage (Hive)
+
+1. Only services interact with Hive.
+2. UI never accesses Hive directly.
+3. Providers call service methods.
+4. Open all boxes during app startup.
+5. Keep storage layer isolated; no business logic inside storage service.
+
+---
+
+## 4. UI / Widgets
+
+- Keep widgets small; if `build` > 80 lines → extract widget.
+- Avoid deep nesting. No async in `build()`. No logic inside UI.
+- **Desktop layout:** Row-based main screen; sidebar fixed 250–300px; editor expands; design for wide screens; avoid mobile-style navigation.
+
+---
+
+## 5. Theme
+
+- Light and Dark mode. Material 3.
+- No hardcoded colors in widgets; colors from Theme.
+- Theme setup in `core/theme/`.
+
+---
+
+## 6. Models
+
+- Immutable; `final` fields; `copyWith()`.
+- No logic, no UI-related code.
+- Include timestamps when needed.
+
+---
+
+## 7. Clean Code
+
+- No duplicated logic. Functions < 40 lines. Meaningful names.
+- No `dynamic` unless required. Prefer `final` over `var`.
+- Avoid deeply nested conditionals; extract helpers. Use `const` constructors when possible.
+
+---
+
+## 8. Desktop UX
+
+- Support window resizing. Consistent spacing (16px). Minimalistic UI. Keyboard shortcuts later.
+
+---
+
+## 9. Performance
+
+- `const` widgets where possible. Avoid rebuilding entire screen. Split widgets logically. Debounce search. No heavy work on UI thread.
+
+---
+
+## 10. Development Workflow (CRITICAL)
+
+1. Generate one file at a time.
+2. Do not modify multiple files.
+3. Stop after generating one file.
+4. No refactor unless requested. No explanations unless requested.
+5. Keep prompts short; code precise.
+
+---
+
+## 11. Prohibitions
+
+- Never mix UI and storage logic; never put business logic in widgets; never access Hive from UI.
+- No large monolithic classes; no premature over-engineering; no `setState` in main architecture; no unnecessary dependencies.
+
+---
+
+## 12. Code Style
+
+- Trailing commas. Named parameters. Lines under ~100 chars. Dart formatting. Clean indentation. Avoid unnecessary comments.
+
+---
+
+## 13. Scalability
+
+Structure must allow adding later: tags, cloud sync, encryption, system tray. Keep code extensible.
+
+---
+
+## 14. Cursor Behavior
+
+- Generate short, production-ready code. Follow architecture strictly. Respect separation of concerns. Never generate multiple files. Wait for next instruction.
+
+---
+
+## Final Principle
+
+Build small. Build clean. Build scalable. Avoid complexity until needed.
