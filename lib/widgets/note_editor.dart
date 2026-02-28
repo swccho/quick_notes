@@ -148,6 +148,20 @@ class _NoteEditorState extends State<NoteEditor> {
                             ),
                           ),
                           IconButton(
+                            icon: const Icon(Icons.upload_file_outlined),
+                            tooltip: 'Export to TXT',
+                            onPressed: () async {
+                              final path = await context
+                                  .read<NoteProvider>()
+                                  .exportSelectedNote();
+                              if (path != null && context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('Exported to: $path')),
+                                );
+                              }
+                            },
+                          ),
+                          IconButton(
                             icon: const Icon(Icons.delete_outline),
                             onPressed: () =>
                                 _confirmDelete(context, selectedNote),

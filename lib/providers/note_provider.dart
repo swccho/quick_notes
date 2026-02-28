@@ -14,10 +14,12 @@ class NoteProvider extends ChangeNotifier {
   bool _isDarkMode = true;
   bool _isReady = false;
   DateTime? _lastCreateAt;
+  String? _initError;
 
   List<Note> get notes => List.unmodifiable(_notes);
   bool get isDarkMode => _isDarkMode;
   bool get isReady => _isReady;
+  String? get initError => _initError;
 
   void toggleTheme() {
     _isDarkMode = !_isDarkMode;
@@ -62,12 +64,17 @@ class NoteProvider extends ChangeNotifier {
 
   Future<void> init() async {
     _isReady = false;
+    _initError = null;
     notifyListeners();
-    await _storage.init();
-    await _storage.initSettings();
-    _notes = _storage.getAllNotes();
-    _isDarkMode = _storage.getIsDarkMode(defaultValue: true);
-    _sortNotes();
+    try {
+      await _storage.init();
+      await _storage.initSettings();
+      _notes = _storage.getAllNotes();
+      _isDarkMode = _storage.getIsDarkMode(defaultValue: true);
+      _sortNotes();
+    } catch (e) {
+      _initError = e.toString();
+    }
     _isReady = true;
     notifyListeners();
   }
@@ -111,6 +118,11 @@ class NoteProvider extends ChangeNotifier {
     await _storage.deleteNote(id);
     if (_selectedNote?.id == id) _selectedNote = null;
     notifyListeners();
+  }
+
+  Future<String?> exportSelectedNote() async {
+    if (_selectedNote == null) return null;
+    return _storage.exportNoteToTxt(_selectedNote!);
   }
 
   Future<void> clearAll() async {
