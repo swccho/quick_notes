@@ -4,8 +4,21 @@ import 'package:provider/provider.dart';
 
 import '../providers/note_provider.dart';
 
-class Sidebar extends StatelessWidget {
+class Sidebar extends StatefulWidget {
   const Sidebar({super.key});
+
+  @override
+  State<Sidebar> createState() => _SidebarState();
+}
+
+class _SidebarState extends State<Sidebar> {
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,10 +47,20 @@ class Sidebar extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 TextField(
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    border: const OutlineInputBorder(),
                     isDense: true,
                     hintText: 'Search notes...',
+                    suffixIcon: provider.searchQuery.isEmpty
+                        ? null
+                        : IconButton(
+                            icon: const Icon(Icons.close),
+                            onPressed: () {
+                              _searchController.clear();
+                              context.read<NoteProvider>().setSearchQuery('');
+                            },
+                          ),
                   ),
                   onChanged: (value) =>
                       context.read<NoteProvider>().setSearchQuery(value),
