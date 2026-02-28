@@ -10,9 +10,28 @@ class NoteProvider extends ChangeNotifier {
   final NoteStorageService _storage;
   List<Note> _notes = [];
   Note? _selectedNote;
+  String _searchQuery = '';
 
   List<Note> get notes => List.unmodifiable(_notes);
+  String get searchQuery => _searchQuery;
+
+  List<Note> get filteredNotes {
+    final q = _searchQuery.trim().toLowerCase();
+    if (q.isEmpty) return List.unmodifiable(_notes);
+    return List.unmodifiable(
+      _notes.where((n) =>
+          n.title.toLowerCase().contains(q) ||
+          n.content.toLowerCase().contains(q)),
+    );
+  }
+
   Note? get selectedNote => _selectedNote;
+
+  void setSearchQuery(String query) {
+    if (_searchQuery == query) return;
+    _searchQuery = query;
+    notifyListeners();
+  }
 
   void selectNote(Note note) {
     _selectedNote = note;

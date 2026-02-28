@@ -9,7 +9,7 @@ class Sidebar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<NoteProvider>();
-    final notes = provider.notes;
+    final notes = provider.filteredNotes;
     final selectedId = provider.selectedNote?.id;
     return SizedBox(
       width: 280,
@@ -24,7 +24,7 @@ class Sidebar extends StatelessWidget {
                 const Text('Quick Notes'),
                 const SizedBox(height: 4),
                 Text(
-                  '${notes.length} Notes',
+                  '${provider.notes.length} Notes',
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
                 const SizedBox(height: 12),
@@ -32,6 +32,16 @@ class Sidebar extends StatelessWidget {
                   onPressed: () =>
                       context.read<NoteProvider>().createNewNote(),
                   child: const Text('New Note'),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    isDense: true,
+                    hintText: 'Search notes...',
+                  ),
+                  onChanged: (value) =>
+                      context.read<NoteProvider>().setSearchQuery(value),
                 ),
               ],
             ),
