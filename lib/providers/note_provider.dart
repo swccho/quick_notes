@@ -11,8 +11,15 @@ class NoteProvider extends ChangeNotifier {
   List<Note> _notes = [];
   Note? _selectedNote;
   String _searchQuery = '';
+  bool _isDarkMode = true;
 
   List<Note> get notes => List.unmodifiable(_notes);
+  bool get isDarkMode => _isDarkMode;
+
+  void toggleTheme() {
+    _isDarkMode = !_isDarkMode;
+    notifyListeners();
+  }
   String get searchQuery => _searchQuery;
 
   List<Note> get filteredNotes {
@@ -30,6 +37,10 @@ class NoteProvider extends ChangeNotifier {
   void setSearchQuery(String query) {
     if (_searchQuery == query) return;
     _searchQuery = query;
+    if (_selectedNote != null &&
+        !filteredNotes.any((n) => n.id == _selectedNote!.id)) {
+      _selectedNote = null;
+    }
     notifyListeners();
   }
 

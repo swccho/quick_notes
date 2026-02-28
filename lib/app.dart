@@ -16,12 +16,18 @@ class QuickNotesApp extends StatelessWidget {
           create: (_) => NoteProvider(NoteStorageService()),
         ),
       ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Quick Notes',
-        theme: ThemeData.light(),
-        darkTheme: ThemeData.dark(),
-        home: const HomeScreen(),
+      child: Builder(
+        builder: (context) {
+          final isDark = context.watch<NoteProvider>().isDarkMode;
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'Quick Notes',
+            theme: ThemeData.light(),
+            darkTheme: ThemeData.dark(),
+            themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
+            home: const HomeScreen(),
+          );
+        },
       ),
     );
   }
